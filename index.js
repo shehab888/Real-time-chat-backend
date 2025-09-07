@@ -30,10 +30,10 @@ initilaizeIo(io);
 
 //? Routes
 app.use("/api/auth", authRouter);
-app.use(Auth);
 app.use("/api/user", userRouter);
 app.use("/api/message", messageRouter);
 app.use("/api/chat", chatRouter);
+app.use(Auth);
 
 //? init the socket setup 
 initializeSocket(io);
