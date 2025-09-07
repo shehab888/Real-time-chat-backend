@@ -42,3 +42,4 @@ server.listen(PORT, () => {
   console.log(`server listen on port ${PORT}`);
   ConnectDB();
 });
+// EMAIL_PASS=iwqgdorrwwljmpga
