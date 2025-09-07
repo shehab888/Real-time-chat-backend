@@ -2,7 +2,8 @@ const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const httpStatus = require("../utils/httpStatus");
-const sendEmail = require("../utils/sendEmail");
+const {sendEmail} = require("../utils/sendEmail");
+const getEmailVerificationTemplate =require('../utils/emailTemplete')
 
 // POST /api/auth/register
 const register = async (req, res) => {
@@ -42,7 +43,7 @@ const register = async (req, res) => {
     await sendEmail(
       newUser.email,
       "verify the email",
-      `<p>click <a href=${url}>here</a> to verify your email</p>`
+      getEmailVerificationTemplate(url,newUser.email)
     );
 
     return res
