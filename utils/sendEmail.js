@@ -1,28 +1,15 @@
 const nodemailer = require("nodemailer");
 
 // Gmail configuration for Railway
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // App password, not regular password
-    },
-    tls: {
-      rejectUnauthorized: false, // Important for Railway
-    },
-    // Connection timeout settings
-    connectionTimeout: 60000, // 1 minute
-    greetingTimeout: 30000, // 30 seconds
-    socketTimeout: 60000, // 1 minute
-    // Pool settings for better performance
-    pool: true,
-    maxConnections: 5,
-    maxMessages: 10,
-  });
-};
+const createTransporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false, // true for port 465, false for 587
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 const sendEmail = async (to, subject, html) => {
   const transporter = createTransporter();
