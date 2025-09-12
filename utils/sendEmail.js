@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 // Gmail configuration for Railway
-const createTransporter = nodemailer.createTransport({
+const createtransporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
   secure: false, // true for port 465, false for 587
@@ -12,7 +12,7 @@ const createTransporter = nodemailer.createTransport({
 });
 
 const sendEmail = async (to, subject, html) => {
-  const transporter = createTransporter();
+  const transporter = createtransporter;
 
   try {
     console.log("Creating email transporter...");
