@@ -34,7 +34,10 @@ const register = async (req, res) => {
     res.cookie("email_verify_token", email_verify_token, {
       httpOnly: true,
       maxAge: 15 * 60 * 1000,
+      secure: true, // required for SameSite=None
+      sameSite: "none", // allow cross-site usage
     });
+
     const url = `${process.env.CLIENT_URL}/api/auth/verify-email/${email_verify_token}`;
     // req.userEmail=newUser.email
     //? save the user in the db before the sent of the email to check if something of the data repeated like email or not
@@ -98,7 +101,9 @@ const login = async (req, res) => {
 
     res.cookie("jwt_token", jwt_token, {
       httpOnly: true,
-      maxAge: 10 * 60 * 1000,
+      maxAge: 60 * 60 * 1000,
+      secure: true, // required for SameSite=None
+      sameSite: "none", // allow cross-site usage
     });
     return res.status(200).json({ status: httpStatus.SUCCESS, data: user });
   } catch (error) {
@@ -166,6 +171,8 @@ const resendEmailVerification = async (req, res) => {
     res.cookie("email_verify_token", email_verify_token, {
       httpOnly: true,
       maxAge: 15 * 60 * 1000,
+      secure: true, // required for SameSite=None
+      sameSite: "none", // allow cross-site usage
     });
     const url = `${process.env.CLIENT_URL}/api/auth/verify-email/${email_verify_token}`;
     await sendEmail(
@@ -206,6 +213,8 @@ const refreshToken = async (req, res) => {
     res.cookie("jwt_token", jwt_token, {
       httpOnly: true,
       maxAge: 10 * 60 * 1000,
+      secure: true, // required for SameSite=None
+      sameSite: "none", // allow cross-site usage
     });
     return res.status(200).json({
       status: httpStatus.SUCCESS,
@@ -237,6 +246,8 @@ const forgotPassword = async (req, res) => {
     res.cookie("reset_verify_email", reset_verify_email, {
       httpOnly: true,
       maxAge: 15 * 60 * 1000,
+      secure: true, // required for SameSite=None
+      sameSite: "none", // allow cross-site usage
     });
     const url = `${process.env.CLIENT_URL}/api/auth/reset-password/${reset_verify_email}`;
     await sendEmail(
