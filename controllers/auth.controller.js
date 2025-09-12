@@ -2,8 +2,8 @@ const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const httpStatus = require("../utils/httpStatus");
-const {sendEmail} = require("../utils/sendEmail");
-const getEmailVerificationTemplate =require('../utils/emailTemplete')
+const { sendEmail } = require("../utils/sendEmail");
+const getEmailVerificationTemplate = require("../utils/emailTemplete");
 
 // POST /api/auth/register
 const register = async (req, res) => {
@@ -43,13 +43,10 @@ const register = async (req, res) => {
     await sendEmail(
       newUser.email,
       "verify the email",
-      getEmailVerificationTemplate(url,newUser.email)
+      getEmailVerificationTemplate(url, newUser.email)
     );
 
-    return res
-      .status(201)
-      .json({ status: httpStatus.SUCCESS, data: newUser })
-      .select({ __v: false });
+    return res.status(201).json({ status: httpStatus.SUCCESS, data: newUser });
   } catch (error) {
     res.status(500).json({ status: httpStatus.ERROR, message: error.message });
   }
@@ -247,12 +244,10 @@ const forgotPassword = async (req, res) => {
       "reset your password",
       `<p>click <a href=${url}>here</a> to reset your password</p>`
     );
-    return res
-      .status(200)
-      .json({
-        status: httpStatus.SUCCESS,
-        message: "the email of reset password has been sent successfuly",
-      });
+    return res.status(200).json({
+      status: httpStatus.SUCCESS,
+      message: "the email of reset password has been sent successfuly",
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
