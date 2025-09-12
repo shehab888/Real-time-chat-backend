@@ -20,7 +20,13 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
 //?Global  Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // your frontend domain in dev
+    credentials: true,
+  })
+);
+
 app.use(cookieParser());
 app.use(express.json());
 
