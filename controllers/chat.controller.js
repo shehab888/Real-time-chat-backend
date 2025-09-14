@@ -22,34 +22,45 @@ const createChat = async (req, res) => {
     const currentUser = req.user;
     const reqBody = req.body;
 
-    //? push the current user to be a part of the group
+    // Normalize participants to string IDs (important for comparing)
+    reqBody.participants = (reqBody.participants || []).map((id) =>
+      id.toString()
+    );
 
-    //? check if the group chat is true
     if (reqBody.isGroupChat) {
-      reqBody.groupOwner = currentUser._id; //? make the owner the current if the client tried to change it we update it before saving
+      // Set group owner
+      reqBody.groupOwner = currentUser._id.toString();
 
-      //? loop on the (groupd admin if there exist admin) if they are not in the particpants put them in the participants
+      // Remove groupAdmins from participants if they exist
       if (reqBody.groupAdmins) {
-        for (let i = 0; i < reqBody.groupAdmins.length; i++) {
-          if (reqBody.participants.includes(groupAdmins[i])) {
-            reqBody.participants.pull(groupAdmins[i]);
-          }
-        }
-      } //? delete the owner from the participants if the group owner
-      if (reqBody.participants.includes(currentUser._id.toString())) {
-        reqBody.participants.pull(currentUser._id);
+        reqBody.groupAdmins = reqBody.groupAdmins.map((id) => id.toString());
+        reqBody.groupAdmins.forEach((adminId) => {
+          reqBody.participants = reqBody.participants.filter(
+            (id) => id !== adminId
+          );
+        });
       }
+
+      // Remove the owner from participants
+      reqBody.participants = reqBody.participants.filter(
+        (id) => id !== currentUser._id.toString()
+      );
     } else {
-      //? in case the clinet make the group chat is true (when update or added group owner or admins) we update it before saving
+      // Reset group-related fields for 1-to-1 chat
       reqBody.isGroupChat = false;
       delete reqBody.groupOwner;
       delete reqBody.groupAdmins;
-      delete reqBody.chatSettings.allowOnlyAdminsToSend;
-
-      //? add the current user as a regular participants not group owner
-      if (!reqBody.participants.includes(currentUser._id.toString())) {
-        reqBody.participants.push(currentUser._id);
+      delete reqBody.chatName;
+      if (reqBody.chatSettings) {
+        delete reqBody.chatSettings.allowOnlyAdminsToSend;
       }
+
+      // Add current user if not already inside
+      if (!reqBody.participants.includes(currentUser._id.toString())) {
+        reqBody.participants.push(currentUser._id.toString());
+      }
+
+      // Enforce max 2 participants in regular chat
       if (reqBody.participants.length > 2) {
         return res.status(400).json({
           status: httpStatus.FAIL,
@@ -59,17 +70,19 @@ const createChat = async (req, res) => {
       }
     }
 
+    // Create new chat
     const newChat = new Chat({
       ...reqBody,
     });
     await newChat.save();
 
-    //? update all the users in one bulk o(1)
+    // Update all users in participants with this chat id
     await User.updateMany(
       { _id: { $in: reqBody.participants } },
       { $addToSet: { chats: newChat._id } }
     );
-    emitToChat(newChat.id, SOCKET_EVENTS.CHAT_CREATED); //? emit the chat created
+
+    emitToChat(newChat.id, SOCKET_EVENTS.CHAT_CREATED);
 
     return res.status(201).json({
       status: httpStatus.SUCCESS,
@@ -80,6 +93,7 @@ const createChat = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 //? GET /api/chat/:chatId
 //! search for chat for the same user not in the global

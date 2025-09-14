@@ -5,7 +5,12 @@ const chatShema = new mongoose.Schema(
     chatName: {
       type: String,
       trim: true,
-      required: [true, "the name of the chat is required"],
+      required: [
+        function () {
+          return this.isGroupChat; // required only if it's a group chat
+        },
+        "It must be that the chat has a name", // custom error message
+      ],
     },
     isGroupChat: {
       type: Boolean,
