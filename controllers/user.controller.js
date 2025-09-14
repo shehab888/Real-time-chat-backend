@@ -187,7 +187,7 @@ const removeFriend = async (req, res) => {
 
     await User.updateOne(
       { _id: currentUser._id },
-      { $pull: { friends: { friendId: friend._id } } }
+      { $pull: { friends: { friend: friend._id } } }
     );
 
     return res.status(201).json({
