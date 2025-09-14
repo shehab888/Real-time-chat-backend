@@ -107,17 +107,15 @@ const addFriends = async (req, res) => {
       });
     }
 
-    const isFriendBefor = await User.find({
+    const isFriendBefor = await User.findOne({
       _id: currentUser._id,
       "friends.friend": friend._id,
     });
     if (isFriendBefor) {
-      return res
-        .status(400)
-        .json({
-          status: httpStatus.FAIL,
-          message: "you added this friend before",
-        });
+      return res.status(400).json({
+        status: httpStatus.FAIL,
+        message: "you added this friend before",
+      });
     }
     await User.updateOne(
       { _id: currentUser._id },
