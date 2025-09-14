@@ -99,12 +99,12 @@ const login = async (req, res) => {
     });
     console.log("jwt_token", jwt_token);
 
-    res.cookie("jwt_token", jwt_token, {
+    res.clearCookie("jwt_token", {
       httpOnly: true,
-      maxAge: 60 * 60 * 1000,
-      secure: true, // required for SameSite=None
-      sameSite: "none", // allow cross-site usage
+      secure: true,
+      sameSite: "none",
     });
+
     return res.status(200).json({ status: httpStatus.SUCCESS, data: user });
   } catch (error) {
     res.status(500).json({ status: httpStatus.ERROR, message: error.message });
@@ -114,7 +114,13 @@ const login = async (req, res) => {
 //? POST /api/auth/logout
 const logout = async (req, res) => {
   try {
-    res.clearCookie("jwt_token");
+    res.clearCookie("jwt_token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      path: "/",
+      domain: ".yourdomain.com",
+    });
     return res.status(200).json({
       status: httpStatus.SUCCESS,
       message: "you logged out successfuly",
